@@ -1,6 +1,0 @@
-[Unit]
-Description=DC/OS Metrics Prometheus Plugin
-
-[Service]
-# replace dcos-role with 'agent' or 'master'
-ExecStart=/opt/mesosphere/bin/dcos-metrics-prometheus --dcos-role master --prometheus-port 61091
