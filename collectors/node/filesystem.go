@@ -17,6 +17,7 @@ package node
 import (
 	"github.com/dcos/dcos-metrics/producers"
 	"github.com/shirou/gopsutil/disk"
+	"strings"
 )
 
 type filesystemMetrics struct {
@@ -46,7 +47,12 @@ func (m *filesystemMetrics) poll() error {
 	for _, part := range parts {
 		usage, err := disk.Usage(part.Mountpoint)
 		if err != nil {
-			return err
+			if err.Error() == "permission denied" && strings.Contains(part.Mountpoint, "docker") {
+				// Docker overlays look like physical volumes, and non-root users (e.g. dcos_metrics) cannot stat them
+				continue
+			} else {
+				return err
+			}
 		}
 
 		f = append(f, filesystemMetric{
